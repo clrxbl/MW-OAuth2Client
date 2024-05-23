@@ -174,7 +174,9 @@ class SpecialOAuth2Client extends SpecialPage {
 			throw new MWException($callback_failure_message);
 		}
 
-		$username = JsonHelper::extractValue($response, $wgOAuth2Client['configuration']['username']);
+		// Discord ID becomes the user's username, with real name being set to their username
+		$username = JsonHelper::extractValue($response, $wgOAuth2Client['configuration']['id']);
+		$real_name = JsonHelper::extractValue($response, $wgOAuth2Client['configuration']['real_name']);
 		// We don't want to save user emails and we don't enable MediaWiki's user email system either.
 		// So we set the email to username (in our case, Discord's user ID)@discordapp.com e.g.
 		// 215448923681062913@discordapp.com
@@ -185,7 +187,7 @@ class SpecialOAuth2Client extends SpecialPage {
 			throw new MWException('Could not create user with username:' . $username);
 			die();
 		}
-		$user->setRealName($username);
+		$user->setRealName($real_name);
 		$user->setEmail($email);
 		$user->load();
 		if ( !( $user instanceof User && $user->getId() ) ) {
