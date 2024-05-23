@@ -175,7 +175,10 @@ class SpecialOAuth2Client extends SpecialPage {
 		}
 
 		$username = JsonHelper::extractValue($response, $wgOAuth2Client['configuration']['username']);
-		$email =  JsonHelper::extractValue($response, $wgOAuth2Client['configuration']['email']);
+		// We don't want to save user emails and we don't enable MediaWiki's user email system either.
+		// So we set the email to username (in our case, Discord's user ID)@discordapp.com e.g.
+		// 215448923681062913@discordapp.com
+		$email = JsonHelper::extractValue($response, $wgOAuth2Client['configuration']['id']) . "@discordapp.com";
 		Hooks::run("OAuth2ClientBeforeUserSave", [&$username, &$email, $response]);
 		$user = User::newFromName($username, 'creatable');
 		if (!$user) {
